@@ -1,87 +1,186 @@
-# selenium: The primary library for controlling a web browser programmatically.
-# webdriver: A module in Selenium that allows you to launch and control browsers.
-# By: A Selenium module that helps locate elements on a page (e.g., by class name, ID, etc.).
-# Service and ChromeDriverManager: The webdriver_manager library handles downloading and setting up ChromeDriver, which is required to run Chrome through Selenium.
-
+#Imports
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.keys import Keys
+
 
 # Initialize Selenium WebDriver for Chrome
 chrome_options = webdriver.ChromeOptions()
-driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
+'''
+Main class
 
+'''
 
-class LinkedIn():
-    def __init__(self, url):
-        self.url = url
+class Go_online:
     
-    def login_page(self):
-        # Establish the username, password to pass to the login page
-        url = self.url
+    def __init__(self):
+        self.driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=chrome_options)
 
-        # Navigate to the webpage
-        driver.get(url)
 
-        # Find the login button and click it
-        login_link = driver.find_element(By.LINK_TEXT, "Sign in with email")    
-        login_link.click()
+    def open_site(self):
+        try:
+            # Navigate to google
+            self.driver.get("https://www.google.com/")
 
-        # Wait
-        driver.implicitly_wait(5)
+            # Pause
+            input("Key enter to continue...")
 
-    def sign_form(self, email, password):
-        self.email = email
+        finally:
+            self.driver.close()
+
+
+
+    
+
+
+'''
+Sub-classes
+
+'''
+
+# Linkedin
+class LinkedIn(Go_online):
+    
+    def __init__(self):
+        super().__init__()
+    
+    # Login to
+    def open_site(self, username, password):
+
+        self.username = username
         self.password = password
 
-        # Find the username button and enter email
-        email_field = driver.find_element(By.ID, "username")
-        email_field.send_keys(email)
+        # Navigate to LinkedIn
+        try:
+            self.driver.get("https://www.linkedin.com/")
 
-        # Find the password button and enter password
-        pass_field = driver.find_element(By.ID, "password")
-        pass_field.send_keys(password)
+            # Pause
+            input("Key enter to continue...")
 
-        driver.implicitly_wait(5)
-
-        # Submit button
-        submit_button = driver.find_element(By.CLASS_NAME, "btn__primary--large.from__button--floating")
-        submit_button.click()
-
-        driver.implicitly_wait(5)
-
-    def job_page(self):
+        except:
+            print("Whoops something's off, possibly your internet connection?")
         
-        # Find and click the job tab
-        link = driver.find_element(By.XPATH, "//a[.//li-icon[@type='job']]")
-        link.click()
+        # Click login button
+        try:
+            login_button = self.driver.find_element(By.LINK_TEXT, "Sign in with email")
+            self.driver.implicitly_wait(10)
+            login_button.click()
 
-        driver.implicitly_wait(5)
+            # Pause
+            input("Key enter to continue...")
 
-        # Click the link that says show all jobs
-        expand_jobs = driver.find_element(By.LINK_TEXT, "Show all")
-        expand_jobs.click()
+        except:
+            print("Whoops something's off, we couldn't find the login button?")
 
-        driver.implicitly_wait(5)
-        
+        # Enter login and password
+        try:
+            email_field = self.driver.find_element(By.ID, "username")
+            email_field.send_keys(username)
 
-        
-user_input = input("Paste a LinkedIn site link here!: ")
+            pass_field = self.driver.find_element(By.ID, "password")
+            pass_field.send_keys(password)
 
-job_search = LinkedIn(user_input)
-job_search.login_page()
+            submit_button = self.driver.find_element(By.CLASS_NAME, "btn__primary--large.from__button--floating")
+            submit_button.click()
 
-login = input("Key any button to login: \n")
+            self.driver.implicitly_wait(5)
 
-# Add your username and password below, as string formats "email.com", "password"
-job_search.sign_form()
+            # Pause
+            input("Key enter to continue...")
 
-job_page = input("Key any button to go to jobs: \n")
+        except:
+            print("Whoops, we can't login?")
 
-job_search.job_page()
+    # Navigate to jobs page
+    def jobs_page(self):
 
-job_page = input("Waiting!: \n")
+        try:
+            # Find and click the job tab
+            link = self.driver.find_element(By.XPATH, "//a[.//li-icon[@type='job']]")
+            link.click()
+
+            self.driver.implicitly_wait(5)
+
+           # Click the link that says show all jobs
+            expand_jobs = self.driver.find_element(By.LINK_TEXT, "Show all")
+            expand_jobs = self.driver.find_element(By.LINK_TEXT, "Show all")
+            expand_jobs.click()
+
+            self.driver.implicitly_wait(5)
+
+            # Pause
+            input("Key enter to continue...")
+
+        except:
+            print("Whoops, we couldn't take you to the jobs page!")
+
+    # Apply to job
+    def apply(self):
+
+        apply_button = self.driver.find_element(By.CLASS_NAME, "jobs-apply-button--top-card")
+        apply_button.click()
+
+        self.driver.implicitly_wait(5)
+
+        print("Waiting for next update :( )")
+
+# Set job searching location
+    def set_job(self):
+
+        try:
+             # Enter intern in job field 
+             job_field = self.driver.find_element(By.CLASS_NAME, "jobs-search-box__text-input")
+             job_field.click()
+
+             self.driver.implicitly_wait(5)
+
+             job_field.send_keys("Software intern")
+             job_field.send_keys(Keys.RETURN)
+
+            # Pause
+             input("Key enter to continue...")
+        except:
+            print("Whoops, we couldn't find the location field?")
+
+        # Toggle easy apply filter
+
+        try:
+            e_button = self.driver.find_element(By.ID, "searchFilter_applyWithLinkedin")
+            e_button.click()
+
+            self.driver.implicitly_wait(5)
+
+            # Pause
+            input("Key enter to continue...")
+
+        except:
+            print("Whoops, couldn't find the EasyApply button?")
+
+    
+
+# Indeed
+class Indeed(Go_online):
+    pass
 
 
+
+# Total Jobs
+class Total_jobs(Go_online):
+    pass
+
+
+
+attempt = LinkedIn()
+attempt.open_site("YOUR EMAIL", "YOUR PASSWORD")
+attempt.jobs_page()
+attempt.set_job()
+attempt.apply()
+
+
+
+'''
+CURRENT STATUS : OPENS JOB ON LINKEDIN BUT DOESN'T APPLY
+'''
